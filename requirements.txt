@@ -1,4 +1,4 @@
 streamlit
 openai
 pydub
-docx
+python-docx

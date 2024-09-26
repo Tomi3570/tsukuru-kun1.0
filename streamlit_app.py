@@ -25,13 +25,13 @@ def format_transcription(transcript):
         f"{transcript}"
     )
 
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         messages=[
             {"role": "system", "content": "あなたは優秀な日本語のエディターです。"},
             {"role": "user", "content": prompt}
         ],
-        model="gpt-4",
-        max_tokens=2048,
+        model="gpt-4o",
+        max_tokens=4096,
         temperature=0
     )
 
@@ -84,7 +84,7 @@ else:
     )
 
     if upload_files:
-        
+
         # Button to start transcription
         trans_start = st.button('文字起こし開始')
 
@@ -93,12 +93,23 @@ else:
             for upload_file in upload_files:
                 with st.spinner(f'***文字起こし中: {upload_file.name}***'):
                     try:
-                        formatted_audio = format_audio(upload_file.read()) 
+                        # Save the uploaded file to a temporary file
+                        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+                            tmp_file.write(upload_file.read())
+                            tmp_file_path = tmp_file.name
+
+                        # Split the audio file into chunks
+                        formatted_audio = format_audio(tmp_file_path)
+
+                        # Transcribe the audio chunks
                         formatted_transcript = transcribe_audio(formatted_audio)
+
                         st.success(f'***{upload_file.name} の文字起こしを完了しました***')
                         st.write(f"***{upload_file.name} の文字起こし結果***")
                         st.write(formatted_transcript)
                         all_transcriptions += formatted_transcript + "\n\n"
+
+                        os.remove(tmp_file_path)  # Remove the temporary file
                     except Exception as e:
                         st.error(f"エラー：{upload_file.name} の文字起こし中に問題が発生しました: {e}")
 

@@ -3,7 +3,12 @@ import openai
 import os
 from openai import OpenAI
 from pydub import AudioSegment
+from pydub.utils import which
 import tempfile
+
+# Set the path to ffmpeg and ffprobe if needed
+AudioSegment.converter = which("ffmpeg")
+AudioSegment.ffprobe = which("ffprobe")
 
 # Function to split audio into chunks
 def format_audio(audio_file_path, chunk_duration_ms=360000):  # 6 minutes chunks

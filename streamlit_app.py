@@ -37,8 +37,8 @@ def format_transcription(transcript):
             {"role": "system", "content": "あなたは優秀な日本語のエディターです。"},
             {"role": "user", "content": prompt}
         ],
-        model="gpt-4o",
-        max_tokens=4096,
+        model="gpt-4o-2024-08-06",
+        max_tokens=16384,
         temperature=0
     )
 
@@ -89,7 +89,7 @@ def save_transcription_to_docx(transcription_text):
 # Show title and description.
 st.title("📄 つくる君2.0")
 st.write(
-    "音声ファイルからレポートを作成します。"
+    "音声データからレポートを作成します。"
     "ご利用にはOpenAIのAPIキーが必要です。 APIキーは[ここから](https://platform.openai.com/account/api-keys)取得できます。 "
 )
 # Set your OpenAI API key
@@ -102,7 +102,7 @@ else:
 
     # Let the user upload a file via `st.file_uploader`.
     upload_files = st.file_uploader(
-        '音声文字起こしするファイルを選択してください。APIの上限により25MB以上のファイルは文字起こし不可です。ファイルを分割する等容量を少なくしてください。',
+        '文字起こしする音声データをアップロード',
         type=['m4a', 'mp3', 'webm', 'mp4', 'mpga', 'wav'],
         accept_multiple_files=True
     )

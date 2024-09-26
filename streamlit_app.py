@@ -4,6 +4,8 @@ import os
 from openai import OpenAI
 from pydub import AudioSegment
 from pydub.utils import which
+from docx import Document
+from io import BytesIO
 import tempfile
 
 # Set the path to ffmpeg and ffprobe if needed
@@ -40,7 +42,7 @@ def format_transcription(transcript):
         temperature=0
     )
 
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 # Function to transcribe the audio chunks
 def transcribe_audio(chunks):
@@ -67,8 +69,24 @@ def transcribe_audio(chunks):
 
     return full_transcript
 
+# Function to save transcription as a .docx file
+def save_transcription_to_docx(transcription_text):
+    doc = Document()
+    doc.add_heading('音声文字起こし結果', 0)
 
- # Show title and description.
+    # Add each paragraph from the transcription
+    paragraphs = transcription_text.split("\n")
+    for para in paragraphs:
+        doc.add_paragraph(para)
+
+    # Save the document in memory
+    doc_io = BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+    return doc_io
+
+#______________________________________________
+# Show title and description.
 st.title("📄 つくる君2.0")
 st.write(
     "音声ファイルからレポートを作成します。"
@@ -79,7 +97,8 @@ openai_api_key = st.text_input("OpenAI APIキー", type="password")
 if not openai_api_key:
     st.info("APIキーを入力後、Enter/Returnキーを押下。", icon="🗝️")
 else:
-    openai.api_key = openai_api_key  # Set the API key for OpenAI
+    os.environ["OPENAI_API_KEY"] = openai_api_key
+    #openai.api_key = openai_api_key  # Set the API key for OpenAI
 
     # Let the user upload a file via `st.file_uploader`.
     upload_files = st.file_uploader(
@@ -120,4 +139,10 @@ else:
 
             # Optionally, allow the user to download the combined transcription
             if all_transcriptions:
-                st.download_button('文字起こし結果をダウンロード', all_transcriptions, file_name='transcription.txt')
+                docx_file = save_transcription_to_docx(all_transcriptions)
+                st.download_button(
+                    label="文字起こし結果をダウンロード (.docx)",
+                    data=docx_file,
+                    file_name="transcription.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )

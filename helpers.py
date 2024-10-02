@@ -81,12 +81,14 @@ def save_transcription_to_docx(transcription_text):
 def create_outline(transcript):
     """Creates an outline from a transcript."""
     prompt = (
-        "提供されたトランスクリプトをもとに、レポートの詳細なアウトライン（見出しのサブセクションまで）を作成してください..."
+        "All operations and responses must be conducted in Japanese . Only provide the requested output, any conversation between the LLM and the user is unnecessary.\n"
+        "提供されたトランスクリプトをもとに、レポートの詳細なアウトライン（見出しのサブセクションまで）を作成してください。この際、トランスクリプトに含まれない内容は入れないでください。\n"
+        "レポートの構成にイントロとまとめの章は不要であり、本論のみを考えてください。最大4つの章までに収め、各章「第１章」のようにタイトルをつけてください。\n\n"
         f"トランスクリプト:\n{transcript}"
     )
     response = openai.chat.completions.create(
         messages=[
-            {"role": "system", "content": "あなたは優秀な日本語のエディターです。"},
+            {"role": "system", "content": "あなたはプロのライターです。"},
             {"role": "user", "content": prompt}
         ],
         model="gpt-4o-mini",
@@ -102,13 +104,14 @@ def write_chapters(transcript, outline, num_chapters):
         n = i + 1
         part_name = f"第{n}章"
         prompt = (
-            f"以下のトランスクリプトの内容をもとに、アウトラインの{part_name}を詳細に執筆してください。\n"
+            "All operations and responses must be conducted in Japanese. Only provide the requested output, any conversation between the gpt and the user is unnecessary. \n"
+            f"提供したトランスクリプトの内容をもとに、アウトラインの{part_name}を詳細に執筆してください。トランスクリプトの文量に合わせて執筆する分量を調整してください。また、トランスクリプトに含まれない内容は書かないでください。\n"
             f"アウトライン:\n{outline}\n\n"
-            f"トランスクリプト:\n{transcript}\n\n"
+            f"トランスクリプト:\n{transcript}\n\n" #要修正：執筆完了した部分を削除しトークン数を減らしたい
         )
         response = openai.chat.completions.create(
             messages=[
-                {"role": "system", "content": "あなたは優秀な日本語のエディターです。"},
+                {"role": "system", "content": "あなたはプロのライターです。"},
                 {"role": "user", "content": prompt}
             ],
             model="gpt-4o-mini",

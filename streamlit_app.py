@@ -1,5 +1,4 @@
 import streamlit as st
-import openai
 import os
 from pydub import AudioSegment
 from pydub.utils import which
@@ -49,22 +48,20 @@ else:
         if trans_start:
             all_transcriptions = ""
             for upload_file in upload_files:
-                with st.spinner(f'***文字起こし中: {upload_file.name}***'):
+                with st.spinner(f'***文字起こし中： {upload_file.name}***'):
                     try:
                         # Save the uploaded file to a temporary file
                         with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
                             tmp_file.write(upload_file.read())
                             tmp_file_path = tmp_file.name
 
-                        # Split the audio file into chunks
+                        # Process the audio: transcribe
                         formatted_audio = format_audio(tmp_file_path)
-
-                        # Transcribe the audio chunks
                         formatted_transcript = transcribe_audio(formatted_audio)
 
                         st.success(f'***{upload_file.name} の文字起こしを完了しました***')
                         st.write(f"***{upload_file.name} の文字起こし結果***")
-                        st.write(formatted_transcript)
+                        st.write(formatted_transcript)#【要修正】文字お越しの一部のみを表示
                         all_transcriptions += formatted_transcript + "\n\n"
 
                         os.remove(tmp_file_path)  # Remove the temporary file
@@ -72,6 +69,9 @@ else:
                         st.error(f"エラー：{upload_file.name} の文字起こし中に問題が発生しました: {e}")
 
             if all_transcriptions:
+                 # Store transcription in session_state
+                st.session_state['all_transcriptions'] = all_transcriptions
+
                 # Automatically show the download button for the transcription
                 docx_transcription = save_transcription_to_docx(all_transcriptions)
                 st.download_button(
@@ -86,28 +86,39 @@ else:
                 with st.spinner('アウトラインを生成中...'):
                     outline = create_outline(all_transcriptions)
 
+                # Store outline in session_state
+                st.session_state['outline'] = outline
+
                 # Provide a text area for the user to input or edit the outline
-                st.write("### アウトラインを確認・編集してください（必要に応じて修正してください）:")
-                user_outline = st.text_area("アウトラインを入力または編集してください", value=outline, height=300)
+                st.write("### アウトラインを確認")
+                user_outline = st.text_area("必要に応じて修正してください", value=outline, height=300)
+                st.session_state['user_outline'] = user_outline
 
-                # Button to proceed to report writing
-                if st.button('レポートを作成'):
-                    # Count chapters based on user-provided outline
-                    num_chapters = outline.count("章")  # Assuming "章" is used to define chapters
+        # If the transcription and outline are available in the session state, show the report generation button
+        if st.session_state['outline']:
+            
+            if st.button('レポートを作成'):
+                # Retrieve variables from session_state
+                all_transcriptions = st.session_state['all_transcriptions']
+                user_outline = st.session_state['user_outline']
 
-                    if num_chapters == 0:
-                        st.error("アウトラインに章が見つかりませんでした。アウトラインを確認してください。")
-                    else:
-                        with st.spinner('レポートを作成中...'):
-                            written_chapters = write_chapters(all_transcriptions, user_outline, num_chapters)
-                        st.success('レポートの作成が完了しました。')
+                # Determine number of chapters
+                chapter_titles = re.findall(r'章\s*([^\n]+)', user_outline)
+                num_chapters = len(chapter_titles)
 
-                        # Prepare the report for download
-                        docx_file = save_report_to_docx("レポート", user_outline, written_chapters)
-                        st.download_button(
-                            label="レポートをダウンロード (.docx)",
-                            data=docx_file,
-                            file_name="report.docx",
-                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                            key="download_report"
-                        )
+                if num_chapters == 0:
+                    st.error("アウトラインに章を特定できませんでした。各章を「第1章」のように記載をしてください。")
+                else:
+                    with st.spinner('レポートを作成中...'):
+                        written_chapters = write_chapters(all_transcriptions, user_outline, num_chapters)
+                    st.success('レポートの作成が完了しました。')
+
+                    # Prepare the report for download
+                    docx_file = save_report_to_docx("レポート", user_outline, written_chapters)
+                    st.download_button(
+                        label="レポートをダウンロード (.docx)",
+                        data=docx_file,
+                        file_name="report.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        key="download_report"
+                    )

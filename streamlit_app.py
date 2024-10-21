@@ -123,8 +123,8 @@ else:
     if 'outline' in st.session_state and st.session_state['outline']:
         if st.button('レポートを作成'):
             # Retrieve variables from session_state
-            #all_transcriptions = st.session_state['all_transcriptions']
-            #user_outline = st.session_state['user_outline']
+            all_transcriptions = st.session_state['all_transcriptions']
+            user_outline = st.session_state['user_outline']
 
             # Determine number of chapters
             chapter_titles = re.findall(r'章\s*([^\n]+)', user_outline)

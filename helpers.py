@@ -105,7 +105,7 @@ def write_chapters(transcript, outline, num_chapters):
         part_name = f"第{n}章"
         prompt = (
             "All operations and responses must be conducted in Japanese. Only provide the requested output, any conversation between the gpt and the user is unnecessary. \n"
-            f"提供したトランスクリプトの内容をもとに、アウトラインの{part_name}を詳細に執筆してください。トランスクリプトの文量に合わせて執筆する分量を調整してください。また、トランスクリプトに含まれない内容は書かないでください。\n"
+            f"あなたはプロのライターです。提供したトランスクリプトの内容をもとに、アウトラインの{part_name}を詳細に執筆してください。トランスクリプトの文量に合わせて執筆する分量を調整してください。また、トランスクリプトに含まれない内容は書かないでください。\n"
             f"アウトライン:\n{outline}\n\n"
             f"トランスクリプト:\n{transcript}\n\n" #要修正：執筆完了した部分を削除しトークン数を減らしたい
         )

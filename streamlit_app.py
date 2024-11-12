@@ -71,7 +71,10 @@ else:
                         st.error(f"エラー：{upload_file.name} の文字起こし中に問題が発生しました: {e}")
 
             if all_transcriptions:
-                 # Store transcription in session_state
+                # Debugging output
+                st.write("transcript completed")  
+                
+                # Store transcription in session_state
                 st.session_state['all_transcriptions'] = all_transcriptions
                 st.session_state['transcription_done'] = True
     

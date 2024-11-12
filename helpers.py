@@ -6,7 +6,7 @@ from io import BytesIO
 from docx import Document
 
 # Function to split audio into chunks
-def format_audio(audio_file_path, chunk_duration_ms=360000):  # 6 minutes chunks
+def format_audio(audio_file_path, chunk_duration_ms=300000):  # 5 minutes chunks
     audio = AudioSegment.from_file(audio_file_path)
     duration_ms = len(audio)
     chunks = []

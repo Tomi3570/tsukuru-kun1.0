@@ -81,6 +81,34 @@ else:
     # After transcription, allow the user to review the transcript before download
     if st.session_state['transcription_done'] and not st.session_state['report_generated']:
         all_transcriptions = st.session_state['all_transcriptions'] 
+        
+        # Allow the user to play a portion of the audio (e.g., the first 30 seconds)
+        st.write("***プレビュー***")
+        if 'audio_file_path' in st.session_state:
+            if os.path.exists(st.session_state['audio_file_path']):
+                try:
+                    # Use a buffer to load only a portion of the audio
+                    with open(st.session_state['audio_file_path'], "rb") as audio_file:
+                        audio = AudioSegment.from_file(audio_file)
+            
+                    preview_audio = audio[:60000]  # Get only the first 60 seconds
+                    
+                    # Save the preview audio to a temporary file for playback
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as audio_file:
+                        preview_audio.export(audio_file.name, format="mp3")
+
+                    # Load and play the audio file
+                    with open(audio_file.name, "rb") as f:
+                        audio_bytes = f.read()
+
+                    st.audio(audio_bytes, format="audio/mp3")
+            
+                except Exception as e:
+                    st.error(f"プレビュー中にエラーが発生しました: {e}")
+            else:
+                st.error("プレビュー用の音声ファイルが見つかりません。")
+
+        st.write(all_transcriptions[:400] + "...") #文字お越しの一部のみを表示
 
         docx_transcription = save_transcription_to_docx(all_transcriptions)
         st.download_button(

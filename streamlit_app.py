@@ -103,7 +103,7 @@ else:
                 except Exception as e:
                     st.error(f"プレビュー中にエラーが発生しました: {e}")
             else:
-                st.error("プレビュー用の音声ファイルが見つかりません。"
+                st.error("プレビュー用の音声ファイルが見つかりません。")
 
         st.write(all_transcriptions[:400] + "...") #文字お越しの一部のみを表示
 

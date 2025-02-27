@@ -85,17 +85,22 @@ else:
         # Allow the user to play a portion of the audio (e.g., the first 30 seconds)
         st.write("***プレビュー***")
         if 'audio_file_path' in st.session_state:
-            audio = AudioSegment.from_file(st.session_state['audio_file_path'])
-            preview_audio = audio[:60000]  # Get the first 60 seconds of the audio
-            
-            # Save the preview audio to a temporary file for playback
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as audio_file:
-                preview_audio.export(audio_file.name, format="mp3")
+            try:
+                audio = AudioSegment.from_file(st.session_state['audio_file_path'])
+                preview_audio = audio[:60000]  # Get the first 60 seconds of the audio
+                
+                # Save the preview audio to a temporary file for playback
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as audio_file:
+                    preview_audio.export(audio_file.name, format="mp3")
 
                 # Load and play the audio file
                 with open(audio_file.name, "rb") as f:
                     audio_bytes = f.read()
-                    st.audio(audio_bytes, format="audio/mp3")
+
+                st.audio(audio_bytes, format="audio/mp3")
+            
+            except Exception as e:
+                st.error(f"プレビュー中にエラーが発生しました: {e}")
 
         st.write(all_transcriptions[:400] + "...") #文字お越しの一部のみを表示
 

@@ -19,7 +19,7 @@ if 'report_generated' not in st.session_state:
     st.session_state['report_generated'] = False
 
 # Show title and description.
-st.title("📄 つくる君")
+st.title("📄 つくる君(test)")
 st.write(
     "音声データからレポートを作成します。"
     "ご利用にはOpenAIのAPIキーが必要です。 APIキーは[ここから](https://platform.openai.com/account/api-keys)取得できます。 "

@@ -1,19 +1,16 @@
-# 📄 Document question answering template
+# tsukuru-kun 1.0
 
-A simple Streamlit app that answers questions about an uploaded document via OpenAI's GPT-3.5.
+音声ファイルから議事録・レポート作成を支援する、生成AI活用ツールです。
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://document-question-answering-template.streamlit.app/)
+## 概要
+本ツールは、コンテンツ制作の現場において、文字起こし後の整形や要点整理、レポート初稿作成にかかる負荷を軽減することを目的としたものです。
 
-### How to run it on your own machine
+## できること
+- 長時間音声ファイルの分割による処理負荷の軽減
+- 文字起こしデータの整形および話し言葉の修正
+- 内容に応じたレポートアウトラインの提案
+- レポート初稿の作成支援
 
-1. Install the requirements
-
-   ```
-   $ pip install -r requirements.txt
-   ```
-
-2. Run the app
-
-   ```
-   $ streamlit run streamlit_app.py
-   ```
+## 制作背景
+インタビューや会議後の編集業務では、音声データの処理、文字起こしの整形、構成案の作成、初稿作成までに多くの時間がかかります。
+その工程を生成AIでどこまで支援できるかを検証するため、本ツールを制作しました。
